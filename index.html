@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>5ives LIVE — community broadcast TV for the AI film era</title>
+<meta name="description" content="5ives LIVE is a free desktop app for broadcast-style TV made by communities. Anyone can run a channel — AI film and open video on shared schedules, streamed peer-to-peer. No accounts, no algorithm, no gatekeepers.">
+<link rel="icon" type="image/png" href="assets/icon.png">
+<link rel="apple-touch-icon" href="assets/icon.png">
+<meta property="og:title" content="5ives LIVE — community broadcast TV">
+<meta property="og:description" content="Anyone can run a TV channel now. Free desktop app for Mac and Windows: AI film and open video on shared schedules, streamed peer-to-peer.">
+<meta property="og:image" content="https://kaigani.github.io/5ives.live/assets/app-concept.jpg">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Chakra+Petch:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy-950: #050814;
+    --navy-900: #07101f;
+    --navy-800: #0b162f;
+    --navy-700: #10203c;
+    --navy-line: #1c2f52;
+    --cyan: #00d8ff;
+    --cyan-bright: #78eaff;
+    --blue: #2478d8;
+    --magenta: #c84dff;
+    --live: #ff3347;
+    --seed: #1ee6a8;
+    --text: #f4f8ff;
+    --text-2: #b8c4dc;
+    --text-3: #748098;
+    --cta: linear-gradient(135deg, #78eaff 0%, #00a8ff 38%, #6c3cff 72%, #c84dff 100%);
+    --display: "Archivo", -apple-system, "Segoe UI", system-ui, sans-serif;
+    --hud: "Chakra Petch", ui-monospace, monospace;
+    --body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; color-scheme: dark; }
+  body {
+    font-family: var(--body);
+    background: var(--navy-950);
+    color: var(--text);
+    line-height: 1.6;
+    background-image:
+      radial-gradient(140% 100% at 100% 0%, rgba(0, 216, 255, 0.05), transparent 55%),
+      radial-gradient(120% 90% at 0% 100%, rgba(13, 63, 120, 0.18), transparent 50%);
+    background-attachment: fixed;
+  }
+  a { color: var(--cyan-bright); text-decoration: none; }
+  img { max-width: 100%; display: block; }
+  :focus-visible { outline: 2px solid var(--cyan-bright); outline-offset: 2px; border-radius: 4px; }
+
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+  .hud {
+    font-family: var(--hud);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--cyan-bright);
+  }
+
+  /* ── Nav ─────────────────────────────────────── */
+  header {
+    position: sticky; top: 0; z-index: 10;
+    background: rgba(5, 8, 20, 0.82);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(120, 234, 255, 0.10);
+  }
+  .nav { display: flex; align-items: center; gap: 20px; height: 64px; }
+  .nav img {
+    height: 42px; width: auto;
+    filter: drop-shadow(0 0 10px rgba(0,216,255,0.4)) drop-shadow(0 0 22px rgba(200,77,255,0.25));
+  }
+  .nav .links { margin-left: auto; display: flex; align-items: center; gap: 22px; }
+  .nav .links a { color: var(--text-2); font-size: 0.9rem; font-weight: 500; }
+  .nav .links a:hover { color: var(--text); }
+  .nav .links a.dl {
+    color: var(--navy-950); background: var(--cta);
+    padding: 8px 18px; border-radius: 999px; font-weight: 700;
+    box-shadow: 0 0 18px rgba(0,216,255,0.35);
+  }
+
+  /* ── Hero ────────────────────────────────────── */
+  .hero { position: relative; overflow: hidden; padding: 84px 0 72px; }
+  .hero::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(55% 45% at 72% 20%, rgba(0,216,255,0.14), transparent 70%),
+      radial-gradient(38% 32% at 88% 70%, rgba(200,77,255,0.12), transparent 70%);
+  }
+  .hero .wrap { position: relative; display: grid; grid-template-columns: 1.25fr 1fr; gap: 56px; align-items: center; }
+  .hero h1 {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: clamp(2.6rem, 6vw, 4.4rem);
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+    margin: 18px 0 22px;
+    text-shadow: 0 0 30px rgba(120, 234, 255, 0.18), 0 4px 28px rgba(0, 0, 0, 0.55);
+  }
+  .hero h1 em { font-style: normal; color: var(--cyan-bright); }
+  .hero .sub { color: var(--text-2); font-size: 1.12rem; max-width: 34em; }
+  .hero .sub strong { color: var(--text); font-weight: 600; }
+
+  .dl-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 34px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: var(--display); font-weight: 700; font-size: 1rem;
+    padding: 14px 26px; border-radius: 999px; transition: all .15s ease;
+  }
+  .btn svg { width: 18px; height: 18px; flex: none; }
+  .btn-primary {
+    background: var(--cta); color: var(--navy-950);
+    box-shadow: 0 0 22px rgba(0,216,255,0.38), 0 0 36px rgba(200,77,255,0.18);
+  }
+  .btn-primary:hover { filter: brightness(1.1); }
+  .btn-ghost {
+    color: var(--text);
+    border: 1px solid rgba(120, 234, 255, 0.28);
+    background: rgba(8, 16, 34, 0.52);
+  }
+  .btn-ghost:hover { border-color: rgba(120,234,255,0.6); box-shadow: 0 0 14px rgba(0,216,255,0.25); }
+  .fine { margin-top: 16px; font-size: 0.82rem; color: var(--text-3); }
+
+  /* Signature: the guide card */
+  .guide-card {
+    position: relative;
+    border-radius: 18px;
+    border: 1px solid rgba(120, 234, 255, 0.36);
+    background: linear-gradient(180deg, rgba(16, 30, 58, 0.78), rgba(6, 10, 24, 0.88));
+    box-shadow: 0 0 24px rgba(0,216,255,0.20), 0 0 28px rgba(200,77,255,0.12), 0 18px 56px rgba(0,0,0,0.48);
+    padding: 22px;
+  }
+  .guide-card .hud { display: block; margin-bottom: 14px; }
+  .gc-row { display: flex; align-items: flex-start; gap: 14px; }
+  .gc-art {
+    width: 84px; height: 56px; border-radius: 10px; flex: none;
+    display: grid; place-items: center;
+    background:
+      radial-gradient(120% 90% at 100% 0%, rgba(0,216,255,0.33), transparent 60%),
+      linear-gradient(180deg, rgba(16,30,58,0.9), rgba(6,10,24,0.95));
+    border: 1px solid rgba(120,234,255,0.2);
+    font-family: var(--display); font-weight: 800; font-size: 1.3rem; color: var(--cyan-bright);
+  }
+  .gc-body { min-width: 0; }
+  .gc-title { font-weight: 700; font-size: 1.02rem; }
+  .gc-sub { color: var(--text-2); font-size: 0.86rem; margin-top: 2px; }
+  .gc-meta { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+  .pill-live {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--live); color: #fff; border-radius: 999px;
+    font-family: var(--hud); font-size: 0.6rem; font-weight: 600;
+    letter-spacing: 0.18em; text-transform: uppercase; padding: 3px 10px;
+  }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: #fff; animation: pulse 1.6s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; transform: scale(1);} 50% { opacity: .35; transform: scale(.8);} }
+  .pips { display: flex; align-items: flex-end; gap: 3px; }
+  .pips span { width: 3px; border-radius: 99px; background: linear-gradient(180deg, var(--cyan-bright), var(--seed)); box-shadow: 0 0 6px rgba(30,230,168,0.45); }
+  .pips span:nth-child(1){height:6px} .pips span:nth-child(2){height:9px} .pips span:nth-child(3){height:11px} .pips span:nth-child(4){height:14px} .pips span:nth-child(5){height:16px}
+  .gc-meta .peers { font-size: 0.78rem; color: var(--text-2); }
+  .gc-next { margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(120,234,255,0.12); font-size: 0.84rem; color: var(--text-3); }
+  .gc-next b { color: var(--text-2); font-weight: 600; }
+
+  /* ── Truth strip ─────────────────────────────── */
+  .strip { border-top: 1px solid rgba(120,234,255,0.10); border-bottom: 1px solid rgba(120,234,255,0.10); background: rgba(7, 16, 31, 0.5); }
+  .strip .wrap { display: flex; flex-wrap: wrap; gap: 10px 36px; justify-content: center; padding: 16px 24px; }
+  .strip .hud { color: var(--text-2); }
+  .strip .hud b { color: var(--cyan-bright); font-weight: 600; }
+
+  /* ── Sections ────────────────────────────────── */
+  section { padding: 88px 0; }
+  .sec-head { max-width: 620px; margin-bottom: 44px; }
+  .sec-head h2 {
+    font-family: var(--display); font-weight: 800;
+    font-size: clamp(1.7rem, 3.4vw, 2.4rem);
+    letter-spacing: -0.02em; line-height: 1.12; margin-top: 12px;
+  }
+  .sec-head p { color: var(--text-2); margin-top: 12px; }
+
+  /* App shot */
+  .shot { padding: 0 0 88px; }
+  .shot .frame {
+    border-radius: 18px; overflow: hidden;
+    border: 1px solid rgba(120, 234, 255, 0.22);
+    box-shadow: 0 0 40px rgba(0,216,255,0.14), 0 0 60px rgba(200,77,255,0.08), 0 30px 80px rgba(0,0,0,0.55);
+  }
+  .shot .cap { text-align: center; margin-top: 16px; font-size: 0.82rem; color: var(--text-3); }
+
+  /* Why tiles */
+  .tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+  .tile {
+    border-radius: 16px; padding: 26px;
+    border: 1px solid rgba(120, 234, 255, 0.15);
+    background:
+      radial-gradient(circle at 20% 20%, rgba(0, 216, 255, 0.10), transparent 34%),
+      linear-gradient(180deg, rgba(15, 28, 55, 0.78), rgba(8, 12, 28, 0.92));
+    transition: all .15s ease;
+  }
+  .tile:hover { border-color: rgba(120,234,255,0.45); box-shadow: 0 0 24px rgba(0,216,255,0.16); }
+  .tile.featured {
+    border-color: rgba(200, 77, 255, 0.28);
+    background:
+      radial-gradient(60% 70% at 85% 0%, rgba(200,77,255,0.16), transparent 70%),
+      linear-gradient(180deg, rgba(15, 28, 55, 0.78), rgba(8, 12, 28, 0.92));
+  }
+  .tile.featured:hover { border-color: rgba(200,77,255,0.55); box-shadow: 0 0 28px rgba(200,77,255,0.2); }
+  .tile h3 { font-family: var(--display); font-weight: 700; font-size: 1.15rem; margin: 14px 0 8px; }
+  .tile p { color: var(--text-2); font-size: 0.95rem; }
+  .tile .hud.tag { color: var(--text-3); }
+  .tile.featured .hud.tag { color: var(--magenta); }
+
+  /* How it works */
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; counter-reset: step; }
+  .step {
+    border-radius: 16px; padding: 26px;
+    border: 1px solid var(--navy-line);
+    background: rgba(11, 22, 47, 0.5);
+  }
+  .step::before {
+    counter-increment: step;
+    content: "0" counter(step);
+    font-family: var(--hud); font-size: 0.8rem; font-weight: 600;
+    letter-spacing: 0.22em; color: var(--cyan);
+  }
+  .step h3 { font-family: var(--display); font-weight: 700; font-size: 1.1rem; margin: 12px 0 8px; }
+  .step p { color: var(--text-2); font-size: 0.93rem; }
+
+  /* Download */
+  #download { scroll-margin-top: 80px; }
+  .platforms { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .platform {
+    border-radius: 18px; padding: 32px;
+    border: 1px solid rgba(120, 234, 255, 0.18);
+    background: linear-gradient(180deg, rgba(16, 30, 58, 0.6), rgba(6, 10, 24, 0.85));
+  }
+  .platform.highlight { border-color: rgba(120,234,255,0.45); box-shadow: 0 0 28px rgba(0,216,255,0.16); }
+  .platform h3 { font-family: var(--display); font-weight: 800; font-size: 1.4rem; display: flex; align-items: center; gap: 10px; }
+  .platform h3 svg { width: 22px; height: 22px; }
+  .platform .req { color: var(--text-3); font-size: 0.84rem; margin-top: 4px; }
+  .platform .btn { margin-top: 20px; }
+  .platform ul { margin: 20px 0 0; padding: 0; list-style: none; }
+  .platform li { font-size: 0.86rem; color: var(--text-2); padding-left: 18px; position: relative; margin-top: 8px; }
+  .platform li::before { content: "▸"; position: absolute; left: 0; color: var(--cyan); }
+  .alpha-note {
+    margin-top: 24px; padding: 18px 22px; border-radius: 14px;
+    border: 1px solid rgba(200, 77, 255, 0.22);
+    background: rgba(200, 77, 255, 0.05);
+    font-size: 0.9rem; color: var(--text-2);
+  }
+  .alpha-note b { color: var(--text); }
+
+  /* Footer */
+  footer { border-top: 1px solid rgba(120,234,255,0.10); padding: 40px 0 60px; }
+  footer .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 32px; }
+  footer img { height: 34px; width: auto; opacity: 0.9; }
+  footer p { color: var(--text-3); font-size: 0.84rem; }
+  footer .links { margin-left: auto; display: flex; gap: 22px; font-size: 0.88rem; }
+
+  @media (max-width: 860px) {
+    .hero .wrap { grid-template-columns: 1fr; gap: 40px; }
+    .tiles, .platforms, .steps { grid-template-columns: 1fr; }
+    .nav .links a:not(.dl) { display: none; }
+    section { padding: 64px 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .dot { animation: none; }
+    * { transition-duration: 0.001ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a href="#top" aria-label="5ives LIVE"><img src="assets/wordmark.png" alt="5ives LIVE"></a>
+    <nav class="links">
+      <a href="#why">Why 5ives</a>
+      <a href="#how">How it works</a>
+      <a class="dl" href="#download">Download</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="hero">
+    <div class="wrap">
+      <div>
+        <span class="hud">Community broadcast TV &nbsp;·&nbsp; Free for Mac &amp; Windows</span>
+        <h1>Anyone can run a <em>TV channel</em> now.</h1>
+        <p class="sub">
+          5ives LIVE is a desktop app for broadcast-style television made by communities —
+          channels of <strong>AI film and openly licensed video</strong> on shared schedules,
+          streamed peer-to-peer. You tune in at the live playhead, like real TV.
+          <strong>No accounts. No algorithm. No gatekeepers.</strong>
+        </p>
+        <div class="dl-row">
+          <a class="btn btn-primary" id="btn-mac" href="https://github.com/kaigani/5ives.live/releases/latest/download/5ives-LIVE-macOS.dmg">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.9c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.8-2-1.6-.2-3.1 1-3.9 1-.8 0-2-.9-3.4-.9-1.7 0-3.3 1-4.2 2.6-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.5 1.3-.1 1.8-.8 3.3-.8s2 .8 3.4.8c1.4 0 2.3-1.3 3.1-2.5.9-1.4 1.3-2.8 1.4-2.9-.1-.1-2.6-1-2.6-4.1zM13.8 5.3c.7-.9 1.2-2.1 1-3.3-1 0-2.3.7-3 1.5-.7.8-1.2 2-1.1 3.2 1.2.1 2.4-.6 3.1-1.4z"/></svg>
+            Download for Mac
+          </a>
+          <a class="btn btn-ghost" id="btn-win" href="https://github.com/kaigani/5ives.live/releases/latest/download/5ives-LIVE-Windows-setup.exe">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.5 10.5 4.4v7.1H3V5.5zm0 13 7.5 1.1v-7H3v5.9zM11.5 4.2 21 3v8.5h-9.5V4.2zm0 15.6L21 21v-8.5h-9.5v7.3z"/></svg>
+            Download for Windows
+          </a>
+        </div>
+        <p class="fine">Free, early-release software · v0.1.0 alpha · no sign-up, ever</p>
+      </div>
+
+      <aside class="guide-card" aria-label="Example channel guide card">
+        <span class="hud">Now playing</span>
+        <div class="gc-row">
+          <div class="gc-art" aria-hidden="true">5</div>
+          <div class="gc-body">
+            <div class="gc-title">Your channel</div>
+            <div class="gc-sub">On air 24/7 — programmed by you</div>
+            <div class="gc-meta">
+              <span class="pill-live"><span class="dot"></span>Live</span>
+              <span class="pips" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+              <span class="peers">seeded by its viewers</span>
+            </div>
+          </div>
+        </div>
+        <div class="gc-next"><b>Up next</b> — whatever you schedule. There is no approval queue.</div>
+      </aside>
+    </div>
+  </div>
+
+  <div class="strip">
+    <div class="wrap">
+      <span class="hud"><b>Free</b> &amp; open</span>
+      <span class="hud"><b>No</b> accounts</span>
+      <span class="hud"><b>No</b> algorithm</span>
+      <span class="hud"><b>Peer-to-peer</b> streaming</span>
+      <span class="hud"><b>Your</b> keys, your channel</span>
+    </div>
+  </div>
+
+  <section id="why">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="hud">Why 5ives</span>
+        <h2>Television used to need a network. Now it needs an audience.</h2>
+        <p>Broadcast TV was always a great idea — shared schedules, appointment viewing, channels with a point of view. The only problem was who got to run one.</p>
+      </div>
+      <div class="tiles">
+        <div class="tile featured">
+          <span class="hud tag">Made for AI video</span>
+          <h3>A venue for the new wave of filmmakers</h3>
+          <p>AI tools have put film production in everyone's hands — what's missing is the cinema. 5ives LIVE gives AI-made series, shorts, and experiments a real broadcast: curated channels with schedules, not clips fed to a feed.</p>
+        </div>
+        <div class="tile">
+          <span class="hud tag">No gatekeeping</span>
+          <h3>Your channel, your rules</h3>
+          <p>Create a channel, set the schedule, publish. Invite collaborators who upload freely — no approval queue, no content review board, no one to say no. Moderation belongs to channel owners, not a platform.</p>
+        </div>
+        <div class="tile">
+          <span class="hud tag">Decentralized</span>
+          <h3>No servers, no middlemen</h3>
+          <p>Video travels peer-to-peer over BitTorrent, and channels publish through plain public Git repos. There is no company in the middle, no upload quota, and nothing to shut down.</p>
+        </div>
+        <div class="tile">
+          <span class="hud tag">Community-preserved</span>
+          <h3>Kept alive by its audience</h3>
+          <p>Love a channel? Save &amp; Seed it. Every viewer who seeds becomes part of the broadcast infrastructure — the more people care about something, the stronger its signal gets.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="shot">
+    <div class="wrap">
+      <div class="frame"><img src="assets/app-concept.jpg" alt="The 5ives LIVE app: a dark, cyan-lit TV interface with a featured program, channel guide, and on-air channel cards" loading="lazy"></div>
+      <p class="cap">Channels, schedules, and a live playhead — TV as an interface, not a feed.</p>
+    </div>
+  </div>
+
+  <section id="how">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="hud">How it works</span>
+        <h2>Watch tonight. Broadcast tomorrow.</h2>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <h3>Install and tune in</h3>
+          <p>Download the app and channels start playing on their shared schedules. Everyone watching a channel sees the same thing at the same time — you join at the live playhead.</p>
+        </div>
+        <div class="step">
+          <h3>Save &amp; seed what you love</h3>
+          <p>Pin a channel and your machine helps carry its broadcast to other viewers. Seed strength is visible in the guide — a channel's health is its community.</p>
+        </div>
+        <div class="step">
+          <h3>Start broadcasting</h3>
+          <p>Create your personal key (it never leaves your device), make a channel, prepare your videos, and publish a schedule to your own GitHub repo. That's the whole stack.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="download">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="hud">Download</span>
+        <h2>Get 5ives LIVE</h2>
+        <p>Free, no sign-up. Download, open, and you're watching.</p>
+      </div>
+      <div class="platforms">
+        <div class="platform" id="plat-mac">
+          <h3><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.9c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.8-2-1.6-.2-3.1 1-3.9 1-.8 0-2-.9-3.4-.9-1.7 0-3.3 1-4.2 2.6-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.5 1.3-.1 1.8-.8 3.3-.8s2 .8 3.4.8c1.4 0 2.3-1.3 3.1-2.5.9-1.4 1.3-2.8 1.4-2.9-.1-.1-2.6-1-2.6-4.1zM13.8 5.3c.7-.9 1.2-2.1 1-3.3-1 0-2.3.7-3 1.5-.7.8-1.2 2-1.1 3.2 1.2.1 2.4-.6 3.1-1.4z"/></svg> macOS</h3>
+          <p class="req">macOS 12 or later · Intel build, runs on Apple Silicon via Rosetta 2</p>
+          <a class="btn btn-primary" href="https://github.com/kaigani/5ives.live/releases/latest/download/5ives-LIVE-macOS.dmg">Download .dmg</a>
+          <ul>
+            <li>Open the .dmg and drag 5ives LIVE to Applications.</li>
+            <li>First launch: the app isn't notarized with Apple yet. If macOS blocks it, right-click the app → Open → Open (or allow it under System Settings → Privacy &amp; Security).</li>
+          </ul>
+        </div>
+        <div class="platform" id="plat-win">
+          <h3><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.5 10.5 4.4v7.1H3V5.5zm0 13 7.5 1.1v-7H3v5.9zM11.5 4.2 21 3v8.5h-9.5V4.2zm0 15.6L21 21v-8.5h-9.5v7.3z"/></svg> Windows</h3>
+          <p class="req">Windows 10 / 11 · x64 installer · WebView2 installs automatically</p>
+          <a class="btn btn-primary" href="https://github.com/kaigani/5ives.live/releases/latest/download/5ives-LIVE-Windows-setup.exe">Download installer</a>
+          <ul>
+            <li>Run the installer. If SmartScreen appears, choose “More info” → “Run anyway” — the app isn't code-signed yet.</li>
+            <li>To publish your own videos, install ffmpeg (<code>winget install ffmpeg</code>). Watching doesn't need it.</li>
+          </ul>
+        </div>
+      </div>
+      <p class="alpha-note"><b>Early software, honestly labeled.</b> This is a v0.1.0 alpha — the broadcast equivalent of day one. Expect rough edges, and expect them to get fixed. Your identity key and settings live on your device; there's no server of ours to lose them to.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <img src="assets/wordmark.png" alt="5ives LIVE">
+    <p>Community broadcast TV. Peer-to-peer, no gatekeepers.</p>
+    <nav class="links">
+      <a href="https://github.com/kaigani/5ives.live">GitHub</a>
+      <a href="#download">Download</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+  // Put the visitor's own platform first: highlight its card and lead button.
+  (function () {
+    var isMac = /Mac/i.test(navigator.platform || "") && !/iPhone|iPad/i.test(navigator.userAgent);
+    var isWin = /Win/i.test(navigator.platform || "");
+    var mac = document.getElementById("btn-mac"), win = document.getElementById("btn-win");
+    if (isWin) {
+      win.classList.replace("btn-ghost", "btn-primary");
+      mac.classList.replace("btn-primary", "btn-ghost");
+      document.getElementById("plat-win").classList.add("highlight");
+    } else if (isMac) {
+      document.getElementById("plat-mac").classList.add("highlight");
+    }
+  })();
+</script>
+
+</body>
+</html>
